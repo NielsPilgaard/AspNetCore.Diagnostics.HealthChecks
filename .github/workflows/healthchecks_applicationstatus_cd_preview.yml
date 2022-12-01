@@ -3,12 +3,12 @@ name: HealthChecks Application Status Preview CD
 on:
   push:
     tags:
-      - preview-applicationstatus-*  # Push events to release-applicationstatus*
+      - preview-applicationstatus-*
 jobs:
   build:
     env:
       BUILD_CONFIG: Release
-      VERSION_SUFFIX: -rc2.${{ github.run_number }}
+      VERSION_SUFFIX: rc2.${{ github.run_number }}
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3

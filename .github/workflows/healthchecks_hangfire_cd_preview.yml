@@ -3,13 +3,13 @@ name: HealthChecks Hangfire Preview CD
 on:
   push:
     tags:
-      - preview-hangfire-*  # Push events to release-hangfire*
+      - preview-hangfire-*
 
 jobs:
   build:
     env:
       BUILD_CONFIG: Release
-      VERSION_SUFFIX: -rc2.${{ github.run_number }}
+      VERSION_SUFFIX: rc2.${{ github.run_number }}
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3

@@ -13,6 +13,7 @@ public class SnsTopicAndSubscriptionHealthCheck : IHealthCheck
         _snsOptions = Guard.ThrowIfNull(snsOptions);
     }
 
+    /// <inheritdoc />
     public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
     {
         try
@@ -21,7 +22,7 @@ public class SnsTopicAndSubscriptionHealthCheck : IHealthCheck
 
             foreach (var (topicName, subscriptions) in _snsOptions.TopicsAndSubscriptions.Select(x => (x.Key, x.Value)))
             {
-                var topic = await client.FindTopicAsync(topicName);
+                var topic = await client.FindTopicAsync(topicName).ConfigureAwait(false);
 
                 if (topic == null)
                 {
@@ -33,11 +34,11 @@ public class SnsTopicAndSubscriptionHealthCheck : IHealthCheck
                     continue;
                 }
 
-                var subscriptionsFromAws = await client.ListSubscriptionsByTopicAsync(topic.TopicArn, cancellationToken);
+                var subscriptionsFromAws = await client.ListSubscriptionsByTopicAsync(topic.TopicArn, cancellationToken).ConfigureAwait(false);
 
                 var subscriptionsArn = subscriptionsFromAws.Subscriptions.Select(s => s.SubscriptionArn);
 
-                foreach (var subscription in subscriptions)
+                foreach (string? subscription in subscriptions)
                 {
                     if (!subscriptionsArn.Contains(subscription))
                     {
@@ -56,8 +57,8 @@ public class SnsTopicAndSubscriptionHealthCheck : IHealthCheck
 
     private AmazonSimpleNotificationServiceClient CreateSnsClient()
     {
-        var credentialsProvided = _snsOptions.Credentials is not null;
-        var regionProvided = _snsOptions.RegionEndpoint is not null;
+        bool credentialsProvided = _snsOptions.Credentials is not null;
+        bool regionProvided = _snsOptions.RegionEndpoint is not null;
         return (credentialsProvided, regionProvided) switch
         {
             (false, false) => new AmazonSimpleNotificationServiceClient(),

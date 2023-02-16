@@ -14,12 +14,13 @@ public class AzureDigitalTwinSubscriptionHealthCheck
         : base(serviceClientCredentials)
     { }
 
+    /// <inheritdoc />
     public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
     {
         try
         {
             var managementClient = ManagementClientConnections.GetOrAdd(ClientConnectionKey, _ => CreateManagementClient());
-            _ = await managementClient.Operations.ListWithHttpMessagesAsync(cancellationToken: cancellationToken);
+            _ = await managementClient.Operations.ListWithHttpMessagesAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
             return HealthCheckResult.Healthy();
         }
         catch (Exception ex)

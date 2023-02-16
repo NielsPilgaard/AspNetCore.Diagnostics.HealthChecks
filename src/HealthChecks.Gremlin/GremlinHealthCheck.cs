@@ -17,16 +17,15 @@ public class GremlinHealthCheck : IHealthCheck
         _server = new GremlinServer(options.Hostname, options.Port, options.EnableSsl);
     }
 
+    /// <inheritdoc />
     public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
     {
         try
         {
-            using (var client = new GremlinClient(_server))
-            using (var conn = new DriverRemoteConnection(client))
-            {
-                var g = Traversal().WithRemote(conn);
-                await g.Inject(0).Promise(t => t.Next());
-            }
+            using var client = new GremlinClient(_server);
+            using var conn = new DriverRemoteConnection(client);
+            var g = Traversal().WithRemote(conn);
+            await g.Inject(0).Promise(t => t.Next()).ConfigureAwait(false);
         }
         catch (Exception ex)
         {

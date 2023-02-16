@@ -13,6 +13,7 @@ public class SecretsManagerHealthCheck : IHealthCheck
         _secretsManagerOptions = Guard.ThrowIfNull(secretsManagerOptions);
     }
 
+    /// <inheritdoc />
     public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
     {
         try
@@ -20,7 +21,7 @@ public class SecretsManagerHealthCheck : IHealthCheck
             using var client = CreateSecretsManagerClient();
             foreach (var secret in _secretsManagerOptions.Secrets)
             {
-                await CheckSecretAsync(client, secret, cancellationToken);
+                await CheckSecretAsync(client, secret, cancellationToken).ConfigureAwait(false);
             }
 
             return HealthCheckResult.Healthy();
@@ -53,6 +54,6 @@ public class SecretsManagerHealthCheck : IHealthCheck
         };
 
         // Check the existence of the secret. If it does not throw it is a valid one (binary or not)
-        _ = await client.GetSecretValueAsync(request, cancellationToken);
+        _ = await client.GetSecretValueAsync(request, cancellationToken).ConfigureAwait(false);
     }
 }

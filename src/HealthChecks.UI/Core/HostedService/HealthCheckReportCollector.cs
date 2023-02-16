@@ -1,9 +1,9 @@
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using HealthChecks.UI.Core.Data;
 using HealthChecks.UI.Core.Extensions;
 using HealthChecks.UI.Core.Notifications;
+using HealthChecks.UI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
@@ -47,8 +47,7 @@ namespace HealthChecks.UI.Core.HostedService
         {
             using (_logger.BeginScope("HealthReportCollector is collecting health checks results."))
             {
-                var healthChecks = await _db.Configurations
-                   .ToListAsync(cancellationToken);
+                var healthChecks = await _db.Configurations.ToListAsync(cancellationToken);
 
                 foreach (var item in healthChecks.OrderBy(h => h.Id))
                 {
